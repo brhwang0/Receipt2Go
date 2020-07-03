@@ -5,11 +5,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,8 +21,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import com.mocoo.hang.rtprinter.driver.HsBluetoothPrintDriver;
 
 public class MainActivity extends AppCompatActivity {
+
+    private BluetoothAdapter bluetoothAdapter = null;
+    private final static int REQUEST_ENABLE_BT = 1;
+    public static HsBluetoothPrintDriver BLUETOOTH_PRINTER = null;
 
     private ArrayList<Order> orders = new ArrayList<>();
 
@@ -28,8 +38,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        fetchOrders("http://sushistamford.com/menuDB/OrdersController.php?view=all");
+
+        // Initialize Bluetooth
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+            Toast.makeText(this, "Device does not support Bluetooth.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
+        // Fetch orders periodically
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                fetchOrders("http://sushistamford.com/menuDB/OrdersController.php?view=all");
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(timerTask, 0, 5000);
+
     }
 
     // Fetches open orders from URL
@@ -44,9 +76,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String json) {
                 super.onPostExecute(json);
+                // JSON data fetched, now parse and initialize orders
                 try {
-                    Log.d("tag", json);
-                    // JSON data fetched, now parse and initialize orders
                     initOrders(json);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -70,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
         DownloadJSON getJSON = new DownloadJSON();
         getJSON.execute();
     }
@@ -80,10 +112,12 @@ public class MainActivity extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("orders");
 
+            orders.clear();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                orders.add(new Order(obj.getString("Order_Number"), obj.getString("Order_Date"), obj.getString("Order_Number")));
+                orders.add(new Order(obj.getString("Order_Number"), obj.getString("Order_Date"), obj.getString("CustomerName")));
             }
+
             initRecyclerView();
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,5 +130,13 @@ public class MainActivity extends AppCompatActivity {
         RVAdapter adapter = new RVAdapter(this, orders);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (BLUETOOTH_PRINTER.IsNoConnection()) {
+            BLUETOOTH_PRINTER.stop();
+        }
     }
 }
