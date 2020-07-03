@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<String> orders = new ArrayList<>();
+    private ArrayList<Order> orders = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initOrders() {
-        orders.add("Test1");
-        orders.add("Test2");
+        orders.add(new Order("Order #1", "12:00 PM", "John Doe"));
+        orders.add(new Order("Order #2", "12:15 PM", "Jane Doe"));
 
         initRecyclerView();
     }
