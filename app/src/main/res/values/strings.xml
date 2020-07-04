@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Receipt2Go</string>
+    <string name="no_orders">No Current Orders</string>
+    <string name="status_connect">Please connect a Bluetooth Printer</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_connected">Connected to: </string>
+    <string name="status_offline"> is offline</string>
 </resources>

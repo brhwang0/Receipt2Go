@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate;
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,20 +30,24 @@ import com.mocoo.hang.rtprinter.driver.HsBluetoothPrintDriver;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BluetoothAdapter bluetoothAdapter = null;
-    private final static int REQUEST_ENABLE_BT = 1;
     public static HsBluetoothPrintDriver BLUETOOTH_PRINTER = null;
+    private final static int REQUEST_ENABLE_BT = 1;
+
+    private BluetoothAdapter bluetoothAdapter = null;
+    private static BluetoothDevice device;
 
     private ArrayList<Order> orders = new ArrayList<>();
 
-    private static TextView NoCurrentOrders = null;
+    private TextView tvNoCurrentOrders = null;
+    private static TextView tvBluetoothStatus = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        NoCurrentOrders = (TextView) findViewById(R.id.tvNoCurrentOrders);
+        tvNoCurrentOrders = findViewById(R.id.tvNoCurrentOrders);
+        tvBluetoothStatus = findViewById(R.id.tvBluetoothStatus) ;
 
         // Initialize Bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -56,6 +60,17 @@ public class MainActivity extends AppCompatActivity {
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            if (BLUETOOTH_PRINTER == null) {
+            } else {
+                if (BLUETOOTH_PRINTER.IsNoConnection()) {
+                    tvBluetoothStatus.setText(device.getName());
+                    tvBluetoothStatus.append(" is offline");
+                } else {
+                    tvBluetoothStatus.setText(R.string.status_connected);
+                    tvBluetoothStatus.append(device.getName());
+                }
+            }
         }
 
         // Fetch orders periodically
@@ -99,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     String json;
                     while ((json = bufferedReader.readLine()) != null) {
-                        sb.append(json + "\n");
+                        sb.append(json).append("\n");
                     }
                     return sb.toString().trim();
                 } catch (Exception e) {
@@ -117,19 +132,18 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject jsonObject = new JSONObject(json);
             if (jsonObject.isNull("orders")) {
-                NoCurrentOrders.setVisibility(View.VISIBLE);
+                tvNoCurrentOrders.setVisibility(View.VISIBLE);
                 orders.clear();
-                initRecyclerView();
             } else {
-                NoCurrentOrders.setVisibility(View.INVISIBLE);
+                tvNoCurrentOrders.setVisibility(View.INVISIBLE);
                 JSONArray jsonArray = jsonObject.getJSONArray("orders");
                 orders.clear();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
                     orders.add(new Order(obj.getString("Order_Number"), obj.getString("Order_Date"), obj.getString("CustomerName")));
                 }
-                initRecyclerView();
             }
+            initRecyclerView();
         } catch (Exception e) {
             e.printStackTrace();
         }
