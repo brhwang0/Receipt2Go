@@ -54,9 +54,8 @@ public class MainActivity extends AppCompatActivity {
         if (bluetoothAdapter == null) {
             // Device doesn't support Bluetooth
             Toast.makeText(this, "Device does not support Bluetooth.", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
         }
+
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -160,8 +159,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (BLUETOOTH_PRINTER.IsNoConnection()) {
-            BLUETOOTH_PRINTER.stop();
-        }
     }
 }
