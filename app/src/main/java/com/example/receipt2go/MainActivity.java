@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -34,10 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Order> orders = new ArrayList<>();
 
+    private static TextView NoCurrentOrders = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        NoCurrentOrders = (TextView) findViewById(R.id.tvNoCurrentOrders);
 
         // Initialize Bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -110,15 +116,20 @@ public class MainActivity extends AppCompatActivity {
     private void initOrders(String json) {
         try {
             JSONObject jsonObject = new JSONObject(json);
-            JSONArray jsonArray = jsonObject.getJSONArray("orders");
-
-            orders.clear();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                orders.add(new Order(obj.getString("Order_Number"), obj.getString("Order_Date"), obj.getString("CustomerName")));
+            if (jsonObject.isNull("orders")) {
+                NoCurrentOrders.setVisibility(View.VISIBLE);
+                orders.clear();
+                initRecyclerView();
+            } else {
+                NoCurrentOrders.setVisibility(View.INVISIBLE);
+                JSONArray jsonArray = jsonObject.getJSONArray("orders");
+                orders.clear();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    orders.add(new Order(obj.getString("Order_Number"), obj.getString("Order_Date"), obj.getString("CustomerName")));
+                }
+                initRecyclerView();
             }
-
-            initRecyclerView();
         } catch (Exception e) {
             e.printStackTrace();
         }
