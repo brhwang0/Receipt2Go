@@ -26,7 +26,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_order, parent, false);
         return new ViewHolder(view);
     }
 
@@ -38,8 +38,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
         holder.listItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, orders.get(position).getOrderNumber(), Toast.LENGTH_SHORT).show();
+                PrintReceipt.print();
             }
+
         });
     }
 
