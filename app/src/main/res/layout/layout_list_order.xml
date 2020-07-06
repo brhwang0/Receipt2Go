@@ -20,18 +20,20 @@
         android:weightSum="1">
 
         <TextView
+            android:id="@+id/orderNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/orderNumber"
-            android:text=""
+            android:layout_gravity="start"
             android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/changa_extralight"
+            android:maxLines="1"
             android:padding="1dp"
+            android:text=""
+            android:textAlignment="gravity"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:layout_gravity="start"
-            android:textAlignment="gravity"/>
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
@@ -48,7 +50,7 @@
             android:id="@+id/orderCustomerName"
             android:padding="1dp"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:maxLines="1"
             android:singleLine="true"/>
 

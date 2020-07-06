@@ -11,4 +11,5 @@
     <string name="scan_button">Search for devices</string>
     <string name="none_paired">No devices have been paired</string>
     <string name="print_error">Please check printer connection!</string>
+    <string name="list_item_order_number">Order\u0020</string>
 </resources>

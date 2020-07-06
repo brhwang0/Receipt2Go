@@ -32,13 +32,14 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.orderNumber.setText(orders.get(position).getOrderNumber());
+        holder.orderNumber.setText(R.string.list_item_order_number);
+        holder.orderNumber.append(orders.get(position).getOrderNumber());
         holder.orderTime.setText(orders.get(position).getOrderTime());
         holder.orderCustomerName.setText(orders.get(position).getOrderCustomerName());
         holder.listItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PrintReceipt.print();
+                PrintReceipt.print(orders.get(position));
             }
 
         });

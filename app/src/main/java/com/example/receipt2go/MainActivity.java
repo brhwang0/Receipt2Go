@@ -48,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Order> orders = new ArrayList<>();
 
+    private TextView tvOrderBanner = null;
     private TextView tvNoCurrentOrders = null;
+    private RecyclerView rvOrders = null;
     private static Button btnBluetoothStatus = null;
 
     @Override
@@ -58,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
         CONTEXT = getApplicationContext();
 
+        tvOrderBanner = findViewById(R.id.tvOrderBanner);
         tvNoCurrentOrders = findViewById(R.id.tvNoCurrentOrders);
+        rvOrders = findViewById(R.id.rvOrders);
         btnBluetoothStatus = findViewById(R.id.btnBluetoothStatus);
         btnBluetoothStatus.setOnClickListener(btnBluetoothStatusOnClickListener);
 
@@ -235,9 +239,13 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject jsonObject = new JSONObject(json);
             if (jsonObject.isNull("orders")) {
+                tvOrderBanner.setVisibility(View.INVISIBLE);
+                rvOrders.setVisibility(View.INVISIBLE);
                 tvNoCurrentOrders.setVisibility(View.VISIBLE);
                 orders.clear();
             } else {
+                tvOrderBanner.setVisibility(View.VISIBLE);
+                rvOrders.setVisibility(View.VISIBLE);
                 tvNoCurrentOrders.setVisibility(View.INVISIBLE);
                 JSONArray jsonArray = jsonObject.getJSONArray("orders");
                 orders.clear();

@@ -6,7 +6,7 @@ import android.widget.Toast;
 
 public class PrintReceipt {
 
-    public static void print() {
+    public static void print(Order order) {
 
         if (MainActivity.BLUETOOTH_PRINTER.IsNoConnection()){
             Toast.makeText(MainActivity.CONTEXT, R.string.print_error, Toast.LENGTH_SHORT).show();
